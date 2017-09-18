@@ -1,0 +1,13 @@
+#include <iostream>
+
+using 				namespace std;
+
+int main(){
+	
+	int a;
+	//float a;
+	double b[10];
+	cout<<"Hello word!"<<endl;
+
+	return 0;
+}
