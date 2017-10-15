@@ -214,7 +214,7 @@ non_ter["def_espec**"] = 8
 non_ter["acceso_array"] = 9
 non_ter["simple_asign"] = 10
 non_ter["sentencia"] = 11
-non_ter["sentencia**"] = 12
+non_ter["sentencia1"] = 12
 non_ter["WHILE"] = 13
 non_ter["IF_ELSE"] = 14
 non_ter["IF_ELSE*"] = 15
@@ -313,8 +313,13 @@ TS[373] = ["vacio"]
 TS[374] = ["vacio"]
 TS[375] = ["OP_ASSIG", "E"]
 TS[403] = ["PAR_O", "E", "PAR_C", "SCOLON"]
+TS[427] = ["ID", "sentencia1", "SCOLON"]
+TS[428] = ["IF_ELSE"]
+TS[429] = ["WHILE"]
+TS[431] = ["NUMBER", "T*", "E*", "SCOLON"]
 TS[443] = ["F*", "T*", "E*"]
 TS[445] = ["vacio"]
+TS[447] = ["def_espec*"]
 TS[458] = ["operadores", "OP_ASSIG", "E"]
 TS[459] = ["operadores", "OP_ASSIG", "E"]
 TS[460] = ["operadores", "OP_ASSIG", "E"]
@@ -395,7 +400,7 @@ TS[1036] = ["op_multiplicativos", "T"]
 TS[1037] = ["op_multiplicativos", "T"]
 TS[1038] = ["op_multiplicativos", "T"]
 TS[1075] = ["ID", "F*"]
-TS[1079] = ["TKN_NUM"]
+TS[1079] = ["NUMBER"]
 TS[1088] = ["vacio"]
 TS[1091] = ["acceso_array"]
 TS[1093] = ["vacio"]
@@ -440,12 +445,17 @@ while i<len(tknList):
     if(pila[0] in non_ter):
         a = non_ter[pila[0]]
         b = ter[tknList[i][2]]
+        print "veo"+str(36*a+b)
         c = TS[36*a+b]
-        
+
         if(c[0]=="vacio"):
             pila.pop(0)
         else:
-            pila.insert(0,c[0])
+            pila.pop(0)
+            for s in reversed(c):
+                pila.insert(0,s)
+                print pila
+                input("control")
         print pila
     else:
         print "error2 se esperaba " + pila[0] + " en linea " + str(tknList[i-1][1])

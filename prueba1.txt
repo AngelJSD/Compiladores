@@ -1,3 +1,5 @@
-int main (){}
+int main (){
+    a=2+3;
+    b=a*9;
     return 0
 }
