@@ -6,6 +6,7 @@ import collections
 
 print "Hello!"
 
+shift = 0
 words = []
 dic = {}
 errors = {}
@@ -202,74 +203,91 @@ non_ter = {}
 ter = {}
 TS = {}
 
-non_ter["S"] = 0
-non_ter["lista_sentencias"] = 1
-non_ter["def_basica"] = 2
-non_ter["tipo_dato"] = 3
-non_ter["lista_def"] = 4
-non_ter["lista_def*"] = 5
-non_ter["def_espec"] = 6
-non_ter["def_espec*"] = 7
-non_ter["def_espec**"] = 8
-non_ter["acceso_array"] = 9
-non_ter["simple_asign"] = 10
-non_ter["sentencia"] = 11
-non_ter["sentencia1"] = 12
-non_ter["WHILE"] = 13
-non_ter["IF_ELSE"] = 14
-non_ter["IF_ELSE*"] = 15
-non_ter["IF"] = 16
-non_ter["W*"] = 17
-non_ter["condicion"] = 18 
-non_ter["condicion*"] = 19
-non_ter["condicion_logica"] = 20 
-non_ter["operadores_log"] = 21
-non_ter["operadores"] = 22
-non_ter["op_aditivos"] = 23
-non_ter["op_multiplicativos"] = 24 
-non_ter["E"] = 25
-non_ter["E*"] = 26
-non_ter["T"] = 27
-non_ter["T*"] = 28
-non_ter["F"] = 29
-non_ter["F*"] = 30
+non_ter["S"] = [0]
+non_ter["lista_sentencias"] = [1]
+non_ter["def_basica"] = [2]
+non_ter["tipo_dato"] = [3, {"type": "null"}]
+non_ter["lista_def"] = [4, {"type": "null"}]
+non_ter["lista_def*"] = [5, {"type": "null"}]
+non_ter["def_espec"] = [6, {"type": "null"}]
+non_ter["def_espec*"] = [7, {"type": "null", "idlex": "null"}]
+non_ter["def_espec**"] = [8, {"type": "null", "value": "null"}]
+non_ter["acceso_array"] = [9, {"pos": "null"}]
+non_ter["simple_asign"] = [10, {"type": "null", "value": "null"}]
+non_ter["sentencia"] = [11]
+non_ter["sentencia1"] = [12, {"type": "null", "idlex": "null", "value": "null"}]
+non_ter["WHILE"] = [13, {"comienzo": "null", "despues": "null", "codigo": ""}]
+non_ter["IF_ELSE"] = [14]
+non_ter["IF_ELSE*"] = [15, {"comienzo": "null"}]
+non_ter["IF"] = [16, {"despues": "null", "codigo": ""}]
+non_ter["W*"] = [17, {"codigo": ""}]
+non_ter["condicion"] = [18, {"codigo": "", "lugar": "null"}]
+non_ter["condicion*"] = [19]
+non_ter["condicion_logica"] = [20]
+non_ter["operadores_log"] = [21, {"operator": "null"}]
+non_ter["operadores"] = [22, {"operator": "null"}]
+non_ter["op_aditivos"] = [23, {"operator": "null"}]
+non_ter["op_multiplicativos"] = [24, {"operator": "null"}]
+non_ter["E"] = [25, {"type": "null", "value": "null", "codigo": "", "lugar": "null"}]
+non_ter["E*"] = [26, {"type": "null", "value": "null", "codigo": "", "lugar": "null"}]
+non_ter["T"] = [27, {"type": "null", "value": "null", "codigo": "", "lugar": "null"}]
+non_ter["T*"] = [28, {"type": "null", "value": "null", "codigo": "", "lugar": "null"}]
+non_ter["F"] = [29, {"type": "null", "value": "null", "codigo": "", "lugar": "null"}]
+non_ter["F*"] = [30, {"type": "null", "value": "null", "codigo": "", "lugar": "null"}]
 
-ter["INCLUDE"] = 0
-ter["TD_INT"] = 1
-ter["TD_FLOAT"] = 2
-ter["TD_DBL"] = 3
-ter["TD_BOOL"] = 4
-ter["TD_CHAR"] = 5
-ter["PR_MAIN"] = 6
-ter["PAR_O"] = 7
-ter["PAR_C"] = 8
-ter["LLA_O"] = 9
-ter["LLA_C"] = 10
-ter["COR_O"] = 11
-ter["COR_C"] = 12
-ter["SCOLON"] = 13
-ter["COMA"] = 14
-ter["OP_ASSIG"] = 15
-ter["PR_RETURN"] = 16
-ter["TKN_NUM_ENTERO"] = 17
-ter["OP_AND"] = 18
-ter["OP_OR"] = 19
-ter["OP_LESS"] = 20
-ter["OP_MORE"] = 21
-ter["OP_MORE_OR_E"] = 22
-ter["OP_LESS_OR_E"] = 23
-ter["OP_EQUAL"] = 24
-ter["OP_DIFFERENT"] = 25
-ter["OP_SUM"] = 26
-ter["OP_SUBS"] = 27
-ter["OP_MULT"] = 28
-ter["OP_DIV"] = 29
-ter["OP_PCNT"] = 30
-ter["ID"] = 31
-ter["PR_IF"] = 32
-ter["PR_WHILE"] = 33
-ter["PR_ELSE"] = 34
-ter["NUMBER"] = 35
+ter["INCLUDE"] = [0]
+ter["TD_INT"] = [1]
+ter["TD_FLOAT"] = [2]
+ter["TD_DBL"] = [3]
+ter["TD_BOOL"] = [4]
+ter["TD_CHAR"] = [5]
+ter["PR_MAIN"] = [6]
+ter["PAR_O"] = [7]
+ter["PAR_C"] = [8]
+ter["LLA_O"] = [9]
+ter["LLA_C"] = [10]
+ter["COR_O"] = [11]
+ter["COR_C"] = [12]
+ter["SCOLON"] = [13]
+ter["COMA"] = [14]
+ter["OP_ASSIG"] = [15]
+ter["PR_RETURN"] = [16]
+ter["TKN_NUM_ENTERO"] = [17]
+ter["OP_AND"] = [18]
+ter["OP_OR"] = [19]
+ter["OP_LESS"] = [20]
+ter["OP_MORE"] = [21]
+ter["OP_MORE_OR_E"] = [22]
+ter["OP_LESS_OR_E"] = [23]
+ter["OP_EQUAL"] = [24]
+ter["OP_DIFFERENT"] = [25]
+ter["OP_SUM"] = [26]
+ter["OP_SUBS"] = [27]
+ter["OP_MULT"] = [28]
+ter["OP_DIV"] = [29]
+ter["OP_PCNT"] = [30]
+ter["ID"] = [31] #{"type": "null", "lexema": "null", "value": 0}
+ter["PR_IF"] = [32]
+ter["PR_WHILE"] = [33]
+ter["PR_ELSE"] = [34]
+ter["NUMBER"] = [35]
+
+def rule9_1():
+    non_ter["tipo_dato"][1]["type"]="int"
+    global shift
+    shift+=4
+def rule9_2():
+    non_ter["tipo_dato"][1]["type"]="float"
+    global shift
+    shift+=8
+def rule9_3():
+    non_ter["tipo_dato"][1]["type"]="double"
+    global shift
+    shift+=16
+def rule9_4():
+    non_ter["tipo_dato"][1]["type"]="boolean"
+    global shift
+    shift+=1
 
 TS[0] = ["INCLUDE", "S"]
 TS[1] = ["TD_INT", "PR_MAIN", "PAR_O", "PAR_C", "LLA_O", "lista_sentencias", "PR_RETURN", "NUMBER", "SCOLON", "LLA_C"]
@@ -286,17 +304,17 @@ TS[67] = ["sentencia", "lista_sentencias"]
 TS[68] = ["sentencia", "lista_sentencias"]
 TS[69] = ["sentencia", "lista_sentencias"]
 TS[71] = ["sentencia", "lista_sentencias"]
-TS[73] = ["tipo_Dato", "lista_def", "SCOLON"]
-TS[74] = ["tipo_Dato", "lista_def", "SCOLON"]
-TS[75] = ["tipo_Dato", "lista_def", "SCOLON"]
-TS[76] = ["tipo_Dato", "lista_def", "SCOLON"]
-TS[77] = ["tipo_Dato", "lista_def", "SCOLON"]
-TS[109] = ["TD_INT"]
+TS[73] = ["tipo_dato", "lista_def", "SCOLON"]
+TS[74] = ["tipo_dato", "lista_def", "SCOLON"]
+TS[75] = ["tipo_dato", "lista_def", "SCOLON"]
+TS[76] = ["tipo_dato", "lista_def", "SCOLON"]
+TS[77] = ["tipo_dato", "lista_def", "SCOLON"]
+TS[109] = ["TD_INT", rule9_1]
 TS[110] = ["TD_FLOAT"]
 TS[111] = ["TD_DBL"]
 TS[112] = ["TD_BOOL"]
 TS[113] = ["TD_CHAR"]
-TS[175] = ["def_espec lista_def*"]
+TS[175] = ["def_espec", "lista_def*"]
 TS[193] = ["vacio"]
 TS[194] = ["COMA", "lista_def"]
 TS[247] = ["ID", "def_espec*"]
@@ -312,6 +330,10 @@ TS[335] = ["COR_O", "TKN_NUM_ENTERO", "COR_C"]
 TS[373] = ["vacio"]
 TS[374] = ["vacio"]
 TS[375] = ["OP_ASSIG", "E"]
+TS[397] = ["def_basica"]
+TS[398] = ["def_basica"]
+TS[399] = ["def_basica"]
+TS[400] = ["def_basica"]
 TS[403] = ["PAR_O", "E", "PAR_C", "SCOLON"]
 TS[427] = ["ID", "sentencia1", "SCOLON"]
 TS[428] = ["IF_ELSE"]
@@ -423,8 +445,8 @@ TS[1110] = ["vacio"]
 
 pila = []
 
-a = non_ter["S"]
-b = ter[tknList[0][2]]
+a = non_ter["S"][0]
+b = ter[tknList[0][2]][0]
 c = TS[36*a+b]
 pila.insert(0,c)
 pila=pila[0]
@@ -434,18 +456,21 @@ while i<len(tknList):
     if len(pila)==0:
         print "error1"
         break
-    while(i<len(tknList) and len(pila)>=0 and tknList[i][2]==pila[0]):
-        i+=1
-        print "Pop " + pila[0]
+    while(i<len(tknList) and len(pila)>=0 and (tknList[i][2]==pila[0] or callable(pila[0]))):
+        if callable(pila[0]):
+            pila[0]()
+        else:
+            i+=1
+        print "Pop " + str(pila[0])
         pila.pop(0)
         print pila
     if len(pila)==0 and i>=len(tknList):
         #print "ACEPTADA"
         break
     if(pila[0] in non_ter):
-        a = non_ter[pila[0]]
-        b = ter[tknList[i][2]]
-        print "veo"+str(36*a+b)
+        a = non_ter[pila[0]][0]
+        b = ter[tknList[i][2]][0]
+        print "veo"+" "+str(a)+" "+str(b)+"="+str(36*a+b)
         c = TS[36*a+b]
 
         if(c[0]=="vacio"):
@@ -458,8 +483,9 @@ while i<len(tknList):
                 input("control")
         print pila
     else:
-        print "error2 se esperaba " + pila[0] + " en linea " + str(tknList[i-1][1])
+        print "error2 se esperaba " + str(pila[0]) + " en linea " + str(tknList[i-1][1])
         pila.pop(0)
         #break
 
 print non_ter["condicion*"]
+print non_ter["sentencia1"][1]["type"]
