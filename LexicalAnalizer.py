@@ -6,7 +6,8 @@ import collections
 
 print "Hello!"
 
-shift = 0
+despl = 0
+idPosInTknList = 0
 words = []
 dic = {}
 errors = {}
@@ -188,6 +189,7 @@ def createSybolTable(tknList):
             aux+=str(iter)+"\t"
         #print symbol + " " + str(SymbolTable[symbol])
         print aux
+    return SymbolTable
 
 f = open('prueba1.txt', 'r')
 print f
@@ -197,7 +199,7 @@ od = collections.OrderedDict(sorted(dic.items(), key=operator.itemgetter(1)))
 f.close()
 
 tknList = createTokensList (od)
-createSybolTable(tknList)
+symbolTable = createSybolTable(tknList)
 
 non_ter = {}
 ter = {}
@@ -272,22 +274,102 @@ ter["PR_WHILE"] = [33]
 ter["PR_ELSE"] = [34]
 ter["NUMBER"] = [35]
 
+def setType(lex, tp):
+    symbolTable[lex][0]=tp
+def getType(lex):
+    return symbolTable[lex][0]
+def setAddress(lex, address):
+    symbolTable[lex][1]=address
+def setValue(lex, value):
+    symbolTable[lex][2]=value
+
+
+def rule8():
+    non_ter["lista_def"][1]["type"]=non_ter["tipo_dato"][1]["type"]
+
 def rule9_1():
     non_ter["tipo_dato"][1]["type"]="int"
-    global shift
-    shift+=4
+    global despl
+    despl+=4
 def rule9_2():
     non_ter["tipo_dato"][1]["type"]="float"
-    global shift
-    shift+=8
+    global despl
+    despl+=8
 def rule9_3():
     non_ter["tipo_dato"][1]["type"]="double"
-    global shift
-    shift+=16
+    global despl
+    despl+=16
 def rule9_4():
     non_ter["tipo_dato"][1]["type"]="boolean"
-    global shift
-    shift+=1
+    global despl
+    despl+=1
+
+def rule10_1():
+    non_ter["def_espec"][1]["type"]=non_ter["lista_def"][1]["type"]
+def rule10_2():
+    non_ter["lista_def*"][1]["type"]=non_ter["def_espec"][1]["type"]
+
+def rule12():
+    setType(tknList[idPosInTknList][0],non_ter["def_espec"][1]["type"])
+    non_ter["def_espec*"][1]["idlex"]=tknList[idPosInTknList][0]
+    setAddress(tknList[idPosInTknList][0], despl)
+
+def rule13_1():
+    if getType(non_ter["def_espec*"][1]["idlex"]) == non_ter["simple_asign"][1]["type"]:
+        setValue(non_ter["def_espec*"][1]["idlex"], non_ter["simple_asign"][1]["type"])
+    else:
+        print("ERROR: Los tipos no coinciden")
+
+def rule15():
+    non_ter["simple_asign"][1]["type"]=non_ter["E"][1]["type"]
+    non_ter["simple_asign"][1]["value"]=non_ter["E"][1]["value"]
+
+def rule25_1():
+    non_ter["E*"][1]["type"] = non_ter["T"][1]["type"]
+    non_ter["E*"][1]["value"] = non_ter["T"][1]["value"]
+    non_ter["E*"][1]["codigo"] = non_ter["T"][1]["codigo"]
+    non_ter["E*"][1]["lugar"] = non_ter["T"][1]["lugar"]
+def rule25_2():
+    non_ter["E"][1]["type"] = non_ter["E*"][1]["type"]
+    non_ter["E"][1]["value"] = non_ter["E*"][1]["value"]
+    non_ter["E"][1]["codigo"] = non_ter["E*"][1]["codigo"]
+    non_ter["E"][1]["lugar"] = non_ter["E*"][1]["lugar"]
+
+def rule27_1():
+    non_ter["T*"][1]["type"] = non_ter["F"][1]["type"]
+    non_ter["T*"][1]["value"] = non_ter["F"][1]["value"]
+    non_ter["T*"][1]["codigo"] = non_ter["F"][1]["codigo"]
+    non_ter["T*"][1]["lugar"] = non_ter["F"][1]["lugar"]
+def rule27_2():
+    non_ter["T"][1]["type"] = non_ter["T*"][1]["type"]
+    non_ter["T"][1]["value"] = non_ter["T*"][1]["value"]
+    non_ter["T"][1]["codigo"] = non_ter["T*"][1]["codigo"]
+    non_ter["T"][1]["lugar"] = non_ter["T*"][1]["lugar"]
+
+
+def rule28():
+    if non_ter["T*"][1]["type"]!="null" and non_ter["T*"][1]["type"]==non_ter["T"][1]["type"]:
+        if non_ter["op_multiplicativos"][1]["operator"]=="*":
+            non_ter["T*"][1]["value"]=str(int(non_ter["T*"][1]["value"])*int(non_ter["T"][1]["value"]))
+        elif non_ter["op_multiplicativos"][1]["operator"] == "/":
+            non_ter["T*"][1]["value"]=str(int(non_ter["T*"][1]["value"])/int(non_ter["T"][1]["value"]))
+        elif non_ter["op_multiplicativos"][1]["operator"] == "%":
+            non_ter["T*"][1]["value"]=str(int(non_ter["T*"][1]["value"])%int(non_ter["T"][1]["value"]))
+        else:
+            print "Error operador invalido"
+        non_ter["T*"][1]["lugar"]="temp_nuevo"
+        non_ter["T*"][1]["codigo"]= non_ter["T*"][1]["codigo"] + non_ter["T"][1]["codigo"] + non_ter["T*"][1]["lugar"] + "=" + non_ter["T*"][1]["lugar"] + non_ter["op_multiplicativos"][1]["operator"] + non_ter["T"][1]["lugar"]
+    else:
+        print "Error las variables no coinciden en tipo"
+
+# TODO: misma regla para suma y recuperar operadores1 0
+
+def rule29():
+    non_ter["F"][1]["type"]=getType(tknList[idPosInTknList][0])
+    non_ter["F"][1]["lugar"]=tknList[idPosInTknList][0]
+    non_ter["F"][1]["value"]=tknList[idPosInTknList][0]
+    non_ter["F"][1]["codigo"]=""
+
 
 TS[0] = ["INCLUDE", "S"]
 TS[1] = ["TD_INT", "PR_MAIN", "PAR_O", "PAR_C", "LLA_O", "lista_sentencias", "PR_RETURN", "NUMBER", "SCOLON", "LLA_C"]
@@ -304,24 +386,24 @@ TS[67] = ["sentencia", "lista_sentencias"]
 TS[68] = ["sentencia", "lista_sentencias"]
 TS[69] = ["sentencia", "lista_sentencias"]
 TS[71] = ["sentencia", "lista_sentencias"]
-TS[73] = ["tipo_dato", "lista_def", "SCOLON"]
-TS[74] = ["tipo_dato", "lista_def", "SCOLON"]
-TS[75] = ["tipo_dato", "lista_def", "SCOLON"]
-TS[76] = ["tipo_dato", "lista_def", "SCOLON"]
-TS[77] = ["tipo_dato", "lista_def", "SCOLON"]
+TS[73] = ["tipo_dato", rule8, "lista_def", "SCOLON"]
+TS[74] = ["tipo_dato", rule8, "lista_def", "SCOLON"]
+TS[75] = ["tipo_dato", rule8, "lista_def", "SCOLON"]
+TS[76] = ["tipo_dato", rule8, "lista_def", "SCOLON"]
+TS[77] = ["tipo_dato", rule8, "lista_def", "SCOLON"]
 TS[109] = ["TD_INT", rule9_1]
-TS[110] = ["TD_FLOAT"]
-TS[111] = ["TD_DBL"]
-TS[112] = ["TD_BOOL"]
+TS[110] = ["TD_FLOAT", rule9_2]
+TS[111] = ["TD_DBL", rule9_3]
+TS[112] = ["TD_BOOL", rule9_4]
 TS[113] = ["TD_CHAR"]
-TS[175] = ["def_espec", "lista_def*"]
+TS[175] = [rule10_1, "def_espec", rule10_2, "lista_def*"]
 TS[193] = ["vacio"]
 TS[194] = ["COMA", "lista_def"]
-TS[247] = ["ID", "def_espec*"]
+TS[247] = ["ID", rule12, "def_espec*"]
 TS[263] = ["acceso_array", "def_espec**"]
 TS[265] = ["vacio"]
 TS[266] = ["vacio"]
-TS[267] = ["simple_asign"]
+TS[267] = ["simple_asign", rule13_1]
 TS[301] = ["vacio"]
 TS[302] = ["vacio"]
 TS[303] = ["simple_asign"]
@@ -329,7 +411,7 @@ TS[335] = ["COR_O", "TKN_NUM_ENTERO", "COR_C"]
 
 TS[373] = ["vacio"]
 TS[374] = ["vacio"]
-TS[375] = ["OP_ASSIG", "E"]
+TS[375] = ["OP_ASSIG", "E", rule15]
 TS[397] = ["def_basica"]
 TS[398] = ["def_basica"]
 TS[399] = ["def_basica"]
@@ -347,7 +429,7 @@ TS[459] = ["operadores", "OP_ASSIG", "E"]
 TS[460] = ["operadores", "OP_ASSIG", "E"]
 TS[461] = ["operadores", "OP_ASSIG", "E"]
 TS[462] = ["operadores", "OP_ASSIG", "E"]
-TS[463] = ["def_spec*"]
+TS[463] = ["def_espec*"]
 TS[501] = ["PR_WHILE", "PAR_O", "condicion", "PAR_C", "W*"]
 TS[536] = ["IF", "IF_ELSE*"]
 TS[574] = ["PR_ELSE", "W*"]
@@ -386,8 +468,8 @@ TS[892] = ["OP_MULT"]
 TS[893] = ["OP_DIV"]
 TS[894] = ["OP_PCNT"]
 TS[907] = ["PAR_O", "E", "PAR_C", "SCOLON"]
-TS[931] = ["T", "E*"]
-TS[935] = ["T", "E*"]
+TS[931] = ["T", rule25_1, "E*", rule25_2]
+TS[935] = ["T", rule25_1, "E*", rule25_2]
 TS[944] = ["vacio"]
 TS[949] = ["vacio"]
 TS[950] = ["vacio"]
@@ -402,8 +484,8 @@ TS[960] = ["vacio"]
 TS[961] = ["vacio"]
 TS[962] = ["op_aditivos", "E"]
 TS[963] = ["op_aditivos", "E"]
-TS[1003] = ["F", "T*"]
-TS[1007] = ["F", "T*"]
+TS[1003] = ["F", rule27_1, "T*", rule27_2]
+TS[1007] = ["F", rule27_1, "T*", rule27_2]
 TS[1016] = ["vacio"]
 TS[1021] = ["vacio"]
 TS[1022] = ["vacio"]
@@ -421,7 +503,7 @@ TS[1035] = ["vacio"]
 TS[1036] = ["op_multiplicativos", "T"]
 TS[1037] = ["op_multiplicativos", "T"]
 TS[1038] = ["op_multiplicativos", "T"]
-TS[1075] = ["ID", "F*"]
+TS[1075] = ["ID", rule29, "F*"]
 TS[1079] = ["NUMBER"]
 TS[1088] = ["vacio"]
 TS[1091] = ["acceso_array"]
@@ -460,6 +542,8 @@ while i<len(tknList):
         if callable(pila[0]):
             pila[0]()
         else:
+            if pila[0]=="ID":
+                idPosInTknList=i
             i+=1
         print "Pop " + str(pila[0])
         pila.pop(0)
@@ -487,5 +571,10 @@ while i<len(tknList):
         pila.pop(0)
         #break
 
-print non_ter["condicion*"]
-print non_ter["sentencia1"][1]["type"]
+print "\nSymbol table:"
+for symbol in symbolTable:
+    aux=str(symbol)+"\t"
+    for iter in symbolTable[symbol]:
+        aux+=str(iter)+"\t"
+    #print symbol + " " + str(symbolTable[symbol])
+    print aux
